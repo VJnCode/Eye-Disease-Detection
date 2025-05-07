@@ -19,8 +19,9 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-
-      const response = await fetch("https://your-fastapi-backend.com/predict", {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'; 
+      // Make sure the API call is correct with your setup
+      const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
         body: formData,
       });
@@ -30,7 +31,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setPrediction(data);
+      setPrediction(data); // Ensure the structure of `data` matches the expected prediction result
     } catch (err) {
       setError(err.message || "An unknown error occurred");
     } finally {

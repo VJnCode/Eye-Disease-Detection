@@ -1,13 +1,14 @@
+"use client";
+
 import { useState, useRef } from "react";
 import { Upload, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Importing Toastify CSS
-import axios from "axios"; // Import axios for making API requests
+import axios from "axios";
 
- function ImageUpload({ isLoading }) {
+export default function ImageUpload({ onUpload, isLoading }) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState(null);
+  const [result, setResult] = useState(null); // State to store the prediction result
   const fileInputRef = useRef(null);
 
   const handleDragOver = (e) => {
@@ -23,6 +24,7 @@ import axios from "axios"; // Import axios for making API requests
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFile(e.dataTransfer.files[0]);
     }
@@ -36,7 +38,7 @@ import axios from "axios"; // Import axios for making API requests
 
   const handleFile = async (file) => {
     if (!file.type.match("image.*")) {
-      toast.error("Please upload a valid image file.");
+      alert("Please upload an image file");
       return;
     }
 
@@ -46,38 +48,28 @@ import axios from "axios"; // Import axios for making API requests
     };
     reader.readAsDataURL(file);
 
+    // Call the onUpload function to notify the parent component
+    onUpload(file);
+
+    // Upload the image and fetch the result
     try {
       const formData = new FormData();
-      formData.append("image", file); // must match FastAPI field
-    const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await axios.post(
-        `${apiUrl}/predict`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      formData.append("image", file);
 
-      if (response.status === 200) {
-        toast.success("Image uploaded successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      } else {
-        toast.error("Failed to upload the image.", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'; // Ensure you use the correct API URL
+      const response = await axios.post(`${apiUrl}/predict`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }); // Log the result in the console
+      console.log(response.data); // Log the response from the server
+
+      // Handle the response (assuming it has a 'message' field or whatever the backend returns)
+      setResult(response.data);  // Update the result state with the server response
+
     } catch (error) {
-      console.error("Upload error:", error);
-      const errMsg = error.response?.data?.detail || error.message;
-      toast.error(`Upload failed: ${errMsg}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      console.error("Error uploading image:", error);
+      setResult({ error: "Failed to fetch prediction" });  // In case of error, update result with error message
     }
   };
 
@@ -92,11 +84,7 @@ import axios from "axios"; // Import axios for making API requests
       transition={{ duration: 0.5 }}
       className="bg-white rounded-lg shadow-md p-6"
     >
-      <motion.h2
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-xl font-semibold text-gray-800 mb-4"
-      >
+      <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-semibold text-gray-800 mb-4">
         Upload Retinal Image
       </motion.h2>
       <motion.p
@@ -105,16 +93,13 @@ import axios from "axios"; // Import axios for making API requests
         transition={{ delay: 0.1 }}
         className="text-gray-600 mb-6"
       >
-        Upload a clear retinal scan image for analysis. Supported formats: JPG,
-        PNG.
+        Upload a clear retinal scan image for analysis. Supported formats: JPG, PNG.
       </motion.p>
 
       <motion.div
         whileHover={{ boxShadow: "0 4px 14px rgba(0, 0, 0, 0.1)" }}
         className={`border-2 border-dashed rounded-lg p-8 text-center ${
-          isDragging
-            ? "border-blue-500 bg-blue-50"
-            : "border-gray-300 hover:border-blue-400"
+          isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400"
         } transition-colors duration-200 cursor-pointer`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -130,10 +115,7 @@ import axios from "axios"; // Import axios for making API requests
               exit={{ opacity: 0, scale: 0.9 }}
               className="flex flex-col items-center"
             >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="relative w-full max-w-xs mx-auto mb-4"
-              >
+              <motion.div whileHover={{ scale: 1.05 }} className="relative w-full max-w-xs mx-auto mb-4">
                 <motion.img
                   initial={{ filter: "blur(10px)" }}
                   animate={{ filter: "blur(0px)" }}
@@ -214,9 +196,16 @@ import axios from "axios"; // Import axios for making API requests
         transition={{ delay: 0.5 }}
         className="mt-6"
       >
-        <h3 className="text-sm font-medium text-gray-700 mb-2">
-          Guidelines for best results:
-        </h3>
+        {result && result.error ? (
+          <p className="text-red-500">Error: {result.error}</p>
+        ) : result ? (
+          <div className="mt-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Prediction Result:</h3>
+            <pre className="bg-gray-100 p-4 rounded-lg">{JSON.stringify(result, null, 2)}</pre>
+          </div>
+        ) : null}
+
+        <h3 className="text-sm font-medium text-gray-700 mb-2">Guidelines for best results:</h3>
         <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
           {[
             "Use high-resolution retinal scans",
@@ -235,10 +224,6 @@ import axios from "axios"; // Import axios for making API requests
           ))}
         </ul>
       </motion.div>
-
-      {/* ToastContainer here */}
-      <ToastContainer />
     </motion.div>
   );
 }
-export default ImageUpload;
