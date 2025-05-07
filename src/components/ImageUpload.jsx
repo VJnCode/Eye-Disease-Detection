@@ -1,10 +1,11 @@
-"use client";
-
 import { useState, useRef } from "react";
 import { Upload, ImageIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Importing Toastify CSS
+import axios from "axios"; // Import axios for making API requests
 
-export default function ImageUpload({ onUpload, isLoading }) {
+ function ImageUpload({ isLoading }) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -22,7 +23,6 @@ export default function ImageUpload({ onUpload, isLoading }) {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFile(e.dataTransfer.files[0]);
     }
@@ -34,9 +34,9 @@ export default function ImageUpload({ onUpload, isLoading }) {
     }
   };
 
-  const handleFile = (file) => {
+  const handleFile = async (file) => {
     if (!file.type.match("image.*")) {
-      alert("Please upload an image file");
+      toast.error("Please upload a valid image file.");
       return;
     }
 
@@ -46,7 +46,39 @@ export default function ImageUpload({ onUpload, isLoading }) {
     };
     reader.readAsDataURL(file);
 
-    onUpload(file);
+    try {
+      const formData = new FormData();
+      formData.append("image", file); // must match FastAPI field
+    const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await axios.post(
+        `${apiUrl}/predict`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Image uploaded successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.error("Failed to upload the image.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      const errMsg = error.response?.data?.detail || error.message;
+      toast.error(`Upload failed: ${errMsg}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   const triggerFileInput = () => {
@@ -203,6 +235,10 @@ export default function ImageUpload({ onUpload, isLoading }) {
           ))}
         </ul>
       </motion.div>
+
+      {/* ToastContainer here */}
+      <ToastContainer />
     </motion.div>
   );
 }
+export default ImageUpload;
