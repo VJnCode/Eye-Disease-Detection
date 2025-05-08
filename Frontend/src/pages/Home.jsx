@@ -1,4 +1,5 @@
 import { useState } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "../components/Header";
 import HeroSection from "../components/HeroSection";
@@ -19,7 +20,7 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'; 
+      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
       // Make sure the API call is correct with your setup
       const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
@@ -40,7 +41,11 @@ export default function Home() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-gray-50">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen bg-gray-50"
+    >
       <Header />
       <main className="container mx-auto px-4 py-8">
         <HeroSection />
@@ -51,7 +56,10 @@ export default function Home() {
           className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8"
         >
           <ImageUpload onUpload={handleImageUpload} isLoading={isLoading} />
-          <motion.div layout className="bg-white rounded-lg shadow-md p-6 overflow-hidden">
+          <motion.div
+            layout
+            className="bg-white rounded-lg shadow-md p-6 overflow-hidden"
+          >
             <AnimatePresence mode="wait">
               {isLoading && (
                 <motion.div
@@ -63,7 +71,11 @@ export default function Home() {
                 >
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1,
+                      ease: "linear",
+                    }}
                     className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full"
                   ></motion.div>
                   <motion.p
@@ -78,13 +90,23 @@ export default function Home() {
               )}
 
               {error && !isLoading && (
-                <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
                   <ErrorMessage message={error} />
                 </motion.div>
               )}
 
               {prediction && !isLoading && !error && (
-                <motion.div key="prediction" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <motion.div
+                  key="prediction"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
                   <PredictionResult prediction={prediction} />
                 </motion.div>
               )}
@@ -117,8 +139,12 @@ export default function Home() {
                       />
                     </svg>
                   </motion.div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">No Results Yet</h3>
-                  <p className="text-gray-600">Upload a retinal image to receive diagnostic predictions</p>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                    No Results Yet
+                  </h3>
+                  <p className="text-gray-600">
+                    Upload a retinal image to receive diagnostic predictions
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -134,7 +160,8 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center text-gray-600">
           <p>© {new Date().getFullYear()} MEDETHERIAL. All rights reserved.</p>
           <p className="mt-2 text-sm">
-            This tool is designed to assist medical professionals and should not replace professional medical advice.
+            This tool is designed to assist medical professionals and should not
+            replace professional medical advice.
           </p>
         </div>
       </motion.footer>

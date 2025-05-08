@@ -1,9 +1,9 @@
-"use client";
-
 import { useState, useRef } from "react";
 import { Upload, ImageIcon } from "lucide-react";
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import PredictionResult from "./PredictionResult";
 
 export default function ImageUpload({ onUpload, isLoading }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -56,7 +56,7 @@ export default function ImageUpload({ onUpload, isLoading }) {
       const formData = new FormData();
       formData.append("image", file);
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'; // Ensure you use the correct API URL
+      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"; // Ensure you use the correct API URL
       const response = await axios.post(`${apiUrl}/predict`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -65,11 +65,10 @@ export default function ImageUpload({ onUpload, isLoading }) {
       console.log(response.data); // Log the response from the server
 
       // Handle the response (assuming it has a 'message' field or whatever the backend returns)
-      setResult(response.data);  // Update the result state with the server response
-
+      setResult(response.data); // Update the result state with the server response
     } catch (error) {
       console.error("Error uploading image:", error);
-      setResult({ error: "Failed to fetch prediction" });  // In case of error, update result with error message
+      setResult({ error: "Failed to fetch prediction" }); // In case of error, update result with error message
     }
   };
 
@@ -84,7 +83,11 @@ export default function ImageUpload({ onUpload, isLoading }) {
       transition={{ duration: 0.5 }}
       className="bg-white rounded-lg shadow-md p-6"
     >
-      <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-semibold text-gray-800 mb-4">
+      <motion.h2
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-xl font-semibold text-gray-800 mb-4"
+      >
         Upload Retinal Image
       </motion.h2>
       <motion.p
@@ -93,13 +96,16 @@ export default function ImageUpload({ onUpload, isLoading }) {
         transition={{ delay: 0.1 }}
         className="text-gray-600 mb-6"
       >
-        Upload a clear retinal scan image for analysis. Supported formats: JPG, PNG.
+        Upload a clear retinal scan image for analysis. Supported formats: JPG,
+        PNG.
       </motion.p>
 
       <motion.div
         whileHover={{ boxShadow: "0 4px 14px rgba(0, 0, 0, 0.1)" }}
         className={`border-2 border-dashed rounded-lg p-8 text-center ${
-          isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400"
+          isDragging
+            ? "border-blue-500 bg-blue-50"
+            : "border-gray-300 hover:border-blue-400"
         } transition-colors duration-200 cursor-pointer`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -115,7 +121,10 @@ export default function ImageUpload({ onUpload, isLoading }) {
               exit={{ opacity: 0, scale: 0.9 }}
               className="flex flex-col items-center"
             >
-              <motion.div whileHover={{ scale: 1.05 }} className="relative w-full max-w-xs mx-auto mb-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative w-full max-w-xs mx-auto mb-4"
+              >
                 <motion.img
                   initial={{ filter: "blur(10px)" }}
                   animate={{ filter: "blur(0px)" }}
@@ -196,16 +205,11 @@ export default function ImageUpload({ onUpload, isLoading }) {
         transition={{ delay: 0.5 }}
         className="mt-6"
       >
-        {result && result.error ? (
-          <p className="text-red-500">Error: {result.error}</p>
-        ) : result ? (
-          <div className="mt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Prediction Result:</h3>
-            <pre className="bg-gray-100 p-4 rounded-lg">{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        ) : null}
+        <PredictionResult result={result} />
 
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Guidelines for best results:</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">
+          Guidelines for best results:
+        </h3>
         <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
           {[
             "Use high-resolution retinal scans",
