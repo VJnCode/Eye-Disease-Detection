@@ -53,10 +53,10 @@ export default function Home() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8"
+          className="mt-12 flex w-screen gap-8"
         >
           <ImageUpload onUpload={handleImageUpload} isLoading={isLoading} />
-          <motion.div
+          {/* <motion.div
             layout
             className="bg-white rounded-lg shadow-md p-6 overflow-hidden"
           >
@@ -148,7 +148,7 @@ export default function Home() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </motion.div> */}
         </motion.div>
       </main>
       <motion.footer
