@@ -54,7 +54,7 @@ export default function ImageUpload({ onUpload, isLoading }) {
     // Upload the image and fetch the result
     try {
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("file", file);
 
       const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"; // Ensure you use the correct API URL
       const response = await axios.post(`${apiUrl}/predict`, formData, {

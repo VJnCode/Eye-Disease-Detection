@@ -6,7 +6,7 @@ import os
 import torch.nn as nn
 
 # Model path
-MODEL_PATH = r"E:\Eye-Disease-Detection\api\app\model\eye_disease_model.pth"
+MODEL_PATH = r"D:\College Works\ML_project\Web\api\app\model\eye_disease_model.pth"
 
 # Load model
 def load_model(model_path=MODEL_PATH):

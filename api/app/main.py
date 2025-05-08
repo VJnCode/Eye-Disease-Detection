@@ -11,16 +11,17 @@ import torch
 app = FastAPI()
 
 # CORS settings for frontend communication
+# Add CORS middleware to allow requests from your frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with your frontend URL for security in production
+    allow_origins=["http://localhost:5173"],  # Set your frontend URL here
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Model and label setup
-MODEL_PATH = r"E:\Eye-Disease-Detection\api\app\model\eye_disease_model.pth"
+MODEL_PATH = r"D:\College Works\ML_project\Web\api\app\model\eye_disease_model.pth"
 categories = ["cataract", "diabetic_retinopathy", "glaucoma", "normal"]
 
 try:
