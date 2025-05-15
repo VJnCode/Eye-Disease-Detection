@@ -10,6 +10,9 @@ export default function ImageUpload({ onUpload, isLoading }) {
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState(null); // State to store the prediction result
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [hasUploaded, setHasUploaded] = useState(false);
+
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -37,40 +40,42 @@ export default function ImageUpload({ onUpload, isLoading }) {
   };
 
   const handleFile = async (file) => {
-    if (!file.type.match("image.*")) {
-      alert("Please upload an image file");
-      return;
-    }
+  if (!file.type.match("image.*")) {
+    alert("Please upload an image file");
+    return;
+  }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-
-    // Call the onUpload function to notify the parent component
-    onUpload(file);
-
-    // Upload the image and fetch the result
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"; // Ensure you use the correct API URL
-      const response = await axios.post(`${apiUrl}/predict`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }); // Log the result in the console
-      console.log(response.data); // Log the response from the server
-
-      // Handle the response (assuming it has a 'message' field or whatever the backend returns)
-      setResult(response.data); // Update the result state with the server response
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      setResult({ error: "Failed to fetch prediction" }); // In case of error, update result with error message
-    }
+  const reader = new FileReader();
+  reader.onload = () => {
+    setPreview(reader.result);
   };
+  reader.readAsDataURL(file);
+
+  onUpload(file);
+  setHasUploaded(true);  // Mark that upload started
+
+  try {
+    setLoading(true);
+    setResult(null);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+    const response = await axios.post(`${apiUrl}/predict`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    setResult(response.data);
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    setResult({ error: "Failed to fetch prediction" });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const triggerFileInput = () => {
     fileInputRef.current?.click();
@@ -205,7 +210,7 @@ export default function ImageUpload({ onUpload, isLoading }) {
           transition={{ delay: 0.5 }}
           className="mt-6"
         >
-          <PredictionResult result={result} />
+         <PredictionResult result={result} loading={loading} hasUploaded={hasUploaded} />
         </motion.div>
       </div>
       <h3 className="text-sm mt-4 font-medium text-gray-700 mb-2">
