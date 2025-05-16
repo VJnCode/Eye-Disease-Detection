@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Upload, ImageIcon } from "lucide-react";
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars  
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import PredictionResult from "./PredictionResult";
