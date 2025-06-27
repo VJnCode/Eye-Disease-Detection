@@ -50,3 +50,13 @@ This application assists in the early detection of retinal diseases using AI, wh
 ```bash
 git clone https://github.com/VJnCode/Eye-Disease-Detection.git
 cd Eye-Disease-Detection
+
+
+---
+
+> ⚠️ **Note:**  
+> <div style="background-color:#ffe6e6; padding: 10px; border-left: 6px solid #ff4d4d;">
+> The main backend API file is hosted on Hugging Face Spaces and cannot be opened directly like a code file.  
+> To view or test the API, navigate to 👉 [https://huggingface.co/spaces/NAVARASA/eye-disease-prediction](https://huggingface.co/spaces/NAVARASA/eye-disease-prediction)
+> </div>
+
