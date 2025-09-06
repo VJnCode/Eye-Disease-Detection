@@ -1,4 +1,4 @@
-# 👁️ Eye Disease Detection using Deep Learning
+# 👁️ OptiVue 
 
 This project uses a Convolutional Neural Network (ResNet-18) model to detect common retinal diseases from fundus images. It supports detection for the following categories:
 
